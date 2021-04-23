@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="00800b15-8371-43b9-bdf6-84f81b16c66e" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<flow name="dw_transmsg_choicerouter_220321Flow" doc:id="3cc97b2c-77b9-44f8-98bf-e9e6be159e84" >
+		<http:listener doc:name="Listener" doc:id="3a955f03-e99b-4b86-b611-120ce4f0b4e3" path="/choice" config-ref="HTTP_Listener_config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="b3b0b647-7477-46aa-92db-333872d06b6b" message="************* SOF :: Choice DW App *************"/>
+		<choice doc:name="Choice" doc:id="96f23619-e35f-4b86-892a-df3227a4df35" >
+			<when expression='#[payload.order.orderHeader.cardName == "SBI"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="11396c7b-10bb-4931-9cc3-27bf5d1f3a2f" message="**********Inside SBI Flow***********"/>
+				<ee:transform doc:name="Transform Message" doc:id="fa71b1f3-c08f-468b-9481-0e0c843824a4" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	orderNumber : payload.order.orderHeader.orderNumber,
+	totalCost : payload.order.orderHeader.totalCost - ((payload.order.orderHeader.totalCost / 100 ) *10)
+}	]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[payload.order.orderHeader.cardName == "ICICI"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="feb3311e-5b5f-4e0f-849b-f2fc84e3020a" message="**********Inside ICICI Flow***********"/>
+				<ee:transform doc:name="Transform Message" doc:id="4618b691-07e7-4ed7-a8db-216bfb013ebd" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	orderNumber : payload.order.orderHeader.orderNumber,
+	totalCost : payload.order.orderHeader.totalCost - ((payload.order.orderHeader.totalCost / 100 ) *15)
+}	]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="d8059fa7-0807-4da4-b974-1143cbb080f8" message="*************Default :: out of scope**************"/>
+				<ee:transform doc:name="Transform Message" doc:id="f259835e-9e3f-47b2-9bcd-1f8febaee306" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var x= "No discount is applicable for "
+var y= payload.order.orderHeader.cardName
+
+---
+{
+	cardNumber: payload.order.orderHeader.orderNumber,
+	Discount :  x ++ y ++ " bank user",
+	totalCost : payload.order.orderHeader.totalCost
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="0821c818-7c5e-4591-a777-5c435c8db338" message="************* EOF :: Choice DW App **************"/>
+	</flow>
+</mule>
