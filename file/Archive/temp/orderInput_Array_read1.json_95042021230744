@@ -1,0 +1,35 @@
+{
+    "sno" : "4",
+    "transid" : "04444",
+	"order" : {
+		"orderHeader" : {
+			"orderNumber" : "0123456",
+			"orderQty" : "6",
+			"totalCost" : "3000",
+			"cardName" : "AXIS",
+			"operation" : "create",
+			"orderLines" : [{
+					"lineNo" : "1111",
+					"lineQty" : 1,
+					"lineCost" : 1000
+				},
+				{
+					"lineNo" : "2222",
+					"lineQty" : 2,
+					"lineCost" : 2000
+				},
+				{
+					"lineNo" : "3333",
+					"lineQty" : 3,
+					"lineCost" : 3000
+				},
+				{
+					"lineNo" : "4444",
+					"lineQty" : 4,
+					"lineCost" : 4000
+				}		
+			]
+		}
+	}
+}
+vars.rootMessage.typedValue.value.order.orderHeader.orderNumber

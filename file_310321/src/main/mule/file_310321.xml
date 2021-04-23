@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<file:config name="File_Config" doc:name="File Config" doc:id="670879c0-bd27-40f3-8740-e9c1723b1a01" >
+		<file:connection workingDir="D:\mule\AnypointStudio\studio-workspace\file\Input_event" />
+	</file:config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="52d82aa9-2673-4ca3-a0b7-847c60a3bc88" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<flow name="file_310321Flow" doc:id="d72ad32d-1086-407b-af0b-a7d299460dac" >
+		<file:listener doc:name="On New or Updated File" doc:id="9cdb2a07-2fd0-4390-ad8a-fb532b53b781" config-ref="File_Config" autoDelete="true" moveToDirectory="D:\mule\AnypointStudio\studio-workspace\file\Archive" renameTo='#[attributes.fileName ++ "_" ++ now() as String {format: "ddMMyyyyHHmmss"}]'>
+			<scheduling-strategy >
+				<fixed-frequency frequency="10" timeUnit="SECONDS" startDelay="10"/>
+			</scheduling-strategy>
+		</file:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="d60d7638-3fa9-48cc-86c3-309e56f7efd5" message="******************* SOF :: The File OnNew File App ********************* #[payload]" />
+		<file:copy doc:name="Copy" doc:id="aa7c0d0d-3676-4f8f-a208-5fe90b0b6e78" config-ref="File_Config" sourcePath="D:\mule\AnypointStudio\studio-workspace\file\Archive\orderInput_Array_read1.json_05042021232149" targetPath="D:\mule\AnypointStudio\studio-workspace\file\Archive\temp"/>
+		<logger level="INFO" doc:name="Logger" doc:id="c98f8f55-712a-45c0-8747-9b2e52b83017" message="******************* EOF :: The File OnNew File App *********************"/>
+	</flow>
+	<flow name="file_310321Flow1" doc:id="e09dc699-46e6-4b45-8f60-579a119dfaa4" >
+		<http:listener doc:name="Listener" doc:id="e0679226-44ef-4dee-98ed-b05efc42a6ea" config-ref="HTTP_Listener_config" path="/read"/>
+		<logger level="INFO" doc:name="Logger" doc:id="dbec1ac8-7239-4af0-91ae-545864a8a73b" message="**************** SOF :: The File Read App *******************"/>
+		<file:read doc:name="Read" doc:id="92c0b34c-0141-438e-84fc-293ae9403381" config-ref="File_Config" path="D:\mule\AnypointStudio\studio-workspace\file\Archive\orderInput_Array_read1.json_05042021232149"/>
+		<logger level="INFO" doc:name="Logger" doc:id="ea889602-0430-41d2-aa48-d330a4bead81" message="**************** EOF :: The File Read App *******************"/>
+	</flow>
+	
+	<flow name="file_310321Flow2" doc:id="668fcab9-328e-4fdd-84fd-e76cd5cca9b2" >
+		<http:listener doc:name="Listener" doc:id="d7d43af0-d74e-4301-b746-9c5abed0afe7" config-ref="HTTP_Listener_config" path="/list"/>
+		<logger level="INFO" doc:name="Logger" doc:id="17dfe134-0b7c-4507-8f3e-183d86cb0503" message="**************** SOF :: The File List App *******************"/>
+		<file:list doc:name="List" doc:id="db4aed85-3408-494b-b80e-a68460f3fd46" config-ref="File_Config" directoryPath="D:\mule\AnypointStudio\studio-workspace\file\Archive"/>
+		<ee:transform doc:name="Transform Message" doc:id="c83581fd-a1c2-41d9-96e2-0deebd5fc88a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="2814f41b-e30a-4912-bfd4-79a674a6e38d" message="**************** EOF :: The File List App *******************"/>
+	</flow>
+	<flow name="file_310321Flow3" doc:id="a89b5cf5-4df2-4ce3-b546-279eba6c55c4">
+		<http:listener doc:name="Listener" doc:id="26be5962-cf5b-40a2-8396-1ca32c2fa094" config-ref="HTTP_Listener_config" path="/write" />
+		<logger level="INFO" doc:name="Logger" doc:id="9614e27b-f76a-48b8-959f-746e3df4a31c" message="**************** SOF :: The File Write App *******************" />
+		<file:write doc:name="Write" doc:id="5408178e-f079-4fc4-92e3-e0735dd2caba" config-ref="File_Config" path='#["D:\\mule\\AnypointStudio\\studio-workspace\\file\\Output\\orderResponse" ++ "_" ++ now() as String {format: "ddMMyyyyHHmmss"} ++ ".json"]' mode="CREATE_NEW" />
+		<file:move doc:name="Move" doc:id="0ecd092b-6e8d-4cdb-8fb7-d51bcb8318ba" config-ref="File_Config" sourcePath="D:\mule\AnypointStudio\studio-workspace\file\Output\orderResponse.json" targetPath="D:\mule\AnypointStudio\studio-workspace\file\Archive" />
+		<file:move doc:name="Move" doc:id="27ff2d56-76dd-4ed0-a671-7c09002f176e" sourcePath="D:\mule\AnypointStudio\studio-workspace\file\ListFolder\req.json" targetPath="D:\mule\AnypointStudio\studio-workspace\file\Output" />
+		<file:delete doc:name="Delete" doc:id="dfe63bd8-9382-4095-abdf-39580c953ac3" config-ref="File_Config" path="D:\mule\AnypointStudio\studio-workspace\file\Output\req.json" />
+		<logger level="INFO" doc:name="Logger" doc:id="690aa767-2c44-472f-9ea2-645f20f2920f" message="**************** EOF :: The File Write App *******************" />
+	</flow>
+</mule>
