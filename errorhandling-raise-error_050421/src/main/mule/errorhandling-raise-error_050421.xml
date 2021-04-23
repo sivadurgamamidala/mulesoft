@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="9603c748-24d5-4df9-8bee-c96fadcb94b7" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<flow name="errorhandling-raise-error_050421Flow" doc:id="ed0ae0d0-7ed0-4353-988e-26e9d45b7d1a" >
+		<http:listener doc:name="Listener" doc:id="4c32152c-630b-4afb-9510-284b90ce4e5c" config-ref="HTTP_Listener_config" path="/raiseerror"/>
+		<logger level="INFO" doc:name="Logger" doc:id="8e2b8c10-23de-4ffe-88e9-b79882aa2d3d" message="************* SOF :: error handling Raise-error App *****************"/>
+		<raise-error doc:name="Raise error" doc:id="a787b32e-86f3-45d8-a08a-e3f55dc11970" type="MULE:EXPRESSION" description="some expression executing DW code"/>
+		<logger level="INFO" doc:name="Logger" doc:id="dd8f7c18-cb14-4781-b80c-dfed22c40a2f" message="************* EOF :: error handling Raise-error App *****************"/>
+	</flow>
+</mule>

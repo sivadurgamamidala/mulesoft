@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<configuration doc:name="Configuration" doc:id="d2928a6d-73aa-476e-8608-f1ed28cecf60" defaultErrorHandler-ref="global-errorhandling_050421Error_Handler" />
+	<error-handler name="global-errorhandling_050421Error_Handler" doc:id="f2b03b57-3b81-498a-9f65-b29cb9867c5e" >
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b82bdc11-a2f6-42c7-8f7c-b1f329a3591e" type="MULE:EXPRESSION">
+			<logger level="INFO" doc:name="Logger" doc:id="3ff01511-7ceb-4714-bc7a-7096541519f1" message="****************** SOF :: Global Handler - Continue Flow *****************"/>
+			<set-payload doc:name="Set Payload" doc:id="75f96afe-2689-4e95-8603-22d9f09608a8" value='#["Updating payload in error continue"]'/>
+			<logger level="INFO" doc:name="Logger" doc:id="b7ba9f2f-8912-447e-ba03-ba5365c1f2a1" message="****************** EOF :: Global Handler - Continue Flow *****************"/>
+		</on-error-continue>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="cdab452c-c3b9-4f34-aed1-a095a539b6e4" type="ANY">
+			<logger level="INFO" doc:name="Logger" doc:id="011574a1-f655-449e-aeb5-be91e53ea698" message="****************** SOF :: Global Handler - Propagate Flow *****************"/>
+			<set-payload value='#["Updating payload in error propagate"]' doc:name="Set Payload" doc:id="c37a94a0-761c-4f7f-b9aa-d8cee26e385a" />
+			<logger level="INFO" doc:name="Logger" doc:id="8bca48e6-922b-4cd5-9963-29dcc6b8ba30" message="****************** EOF :: Global Handler - Propagate Flow *****************"/>
+		</on-error-propagate>
+	</error-handler>
+</mule>
