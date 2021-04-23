@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="e005973f-6357-4223-869e-f53fd0180547" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<flow name="foreach_240321Flow" doc:id="275dbb34-17c1-42a9-baed-cb214243793d" >
+		<http:listener doc:name="Listener" doc:id="a82314df-36b0-47fb-a34c-83174f3346c7" config-ref="HTTP_Listener_config" path="/foreach"/>
+		<logger level="INFO" doc:name="Logger" doc:id="b46940eb-93ca-4aee-9754-2a440afbe173" message="************SOF :: ForEach App********* Payload is :: #[payload]"/>
+		<foreach doc:name="For Each" doc:id="2f9ae4af-2bd6-487f-b491-8b5b12beb9c8" collection="#[payload.order.orderHeader.orderLines]">
+			<logger level="INFO" doc:name="Logger" doc:id="5b74000e-b3c8-424d-b669-fc350d52a952" message="**************SOF :: Inside ForEach :: The Payload is :: #[payload] ************"/>
+			<logger level="INFO" doc:name="Logger" doc:id="a32df376-ccc3-445a-a7a4-3df4f806ebc6" message="**************EOF :: Inside ForEach :: The Payload is :: #[payload] ************"/>
+		</foreach>
+		<logger level="INFO" doc:name="Logger" doc:id="24e4cd69-fcae-4f70-b21d-df9f40b4fca3" message="************EOF :: ForEach App*********"/>
+	</flow>
+</mule>
