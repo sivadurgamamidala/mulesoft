@@ -1,0 +1,42 @@
+#%RAML 1.0
+title: AzmOrderProcessing
+baseUri: http://localhost:8081/api/amzorder
+description: This is RAML is for Amazon Order Processing
+
+/process:
+  post:
+    body:
+      application/json:
+        example:
+          {
+          "order": {
+            "orderHeader" : {
+              "orderNumber" : "0123456",
+              "orderQty" : "6",
+              "totalCost" : "1500",
+              "cardName" : "SBI",
+              "operation" : "Create"
+            }
+          }
+        }
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              {
+                "message" : "Order created successfully"
+              }
+  get:
+    queryParameters:
+      orderNumber:
+        type: string
+        required : true
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              {
+                "message" : "Order retrived successfully"
+              }
