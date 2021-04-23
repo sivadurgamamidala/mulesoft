@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a29b8d31-6ea4-4a11-86c4-0c2fdeb7457e" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="ba81bf94-6c16-4c6a-9363-68a75cdfbf61" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="student" database="trainingv" />
+	</db:config>
+	<flow name="database_270321Flow" doc:id="16ac2991-3fa0-49e0-bac5-97639ad71382" >
+		<http:listener doc:name="Listener" doc:id="2285d090-00e6-45c1-8f06-73864e09dd4b" config-ref="HTTP_Listener_config" path="/insert"/>
+		<logger level="INFO" doc:name="Logger" doc:id="1283613b-9150-413a-aef9-8bfaa682ea91" message="************** SOF ::  DB App :: Insert *************"/>
+		<db:insert doc:id="a8eb668d-573a-4c8f-a5f6-46289d0ac101" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO trainingv.amzorder (transid, orderNumber, ordertotal, orderqty, cardname, operation) VALUES (:transid, :orderNumber, :ordertotal, :orderqty, :cardname, :operation)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	transid: payload.order.orderHeader.transid,
+	orderNumber : payload.order.orderHeader.orderNumber,
+	ordertotal : payload.order.orderHeader.totalCost,
+	orderqty : payload.order.orderHeader.orderQty,
+	cardname: payload.order.orderHeader.cardName,
+	operation: payload.order.orderHeader.operation
+}]]]></db:input-parameters>
+		</db:insert>
+		<logger level="INFO" doc:name="Logger" doc:id="0f371081-41c5-4798-9916-86e61b9f9b1a" message="************** EOF ::  DB App :: Insert *************"/>
+	</flow>
+</mule>
