@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="e3f3231d-e4ed-4824-80a6-1bf49d217d3e" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="59b2f06a-f929-4d34-a075-81c95a7acc8d" file="dev.yaml" />
+	<flow name="admin_050321Flow" doc:id="819a0719-3ab4-4a79-8b63-03b5a5ab6339" >
+		<http:listener doc:name="Listener" doc:id="d05b3412-0d16-439d-8f32-75a3f920496b" config-ref="HTTP_Listener_config" path="/admin"/>
+		<logger level="INFO" doc:name="Logger" doc:id="371f6cdd-751a-40b7-b6cc-698726ffb815" message="*************** SOF :: Mule Admin App *************** ${env}"/>
+		<set-payload value='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	message : "App executed successfully"&#10;}]' doc:name="Set Payload" doc:id="595cdaf3-f421-4b35-aa82-d364ebee8ece" />
+		<logger level="INFO" doc:name="Logger" doc:id="a4a56bdf-23c3-48cc-83e4-1f3b4c9407b0" message="*************** EOF :: Mule Admin App ***************"/>
+	</flow>
+</mule>
