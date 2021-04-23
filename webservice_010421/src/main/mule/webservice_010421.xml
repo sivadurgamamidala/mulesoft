@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="056da5df-3941-4fd6-9897-bae70114a964" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="356048d3-6fe2-40e6-b472-ac22ba1af10a" >
+		<wsc:connection wsdlLocation="calculator.wsdl" service="Calculator" port="CalculatorSoap" address="http://www.dneonline.com/calculator.asmx"/>
+	</wsc:config>
+	<flow name="webservice_010421Flow" doc:id="bf51b900-011e-4846-9e73-f306ae7d02cd" >
+		<http:listener doc:name="Listener" doc:id="52ea6161-f89d-4498-8365-2b8365b4205d" config-ref="HTTP_Listener_config" path="/calculator"/>
+		<logger level="INFO" doc:name="Logger" doc:id="5ac0e8b2-a2d6-4067-bc6f-8a27d7589089" message="************** SOF :: Calc webservice App ****************"/>
+		<ee:transform doc:name="Transform Message" doc:id="894c297a-ef6e-4319-a969-6bedf2dad882" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns tem http://tempuri.org/
+---
+{
+	tem#Add: 
+		{
+			tem#intA : payload.param1,
+			tem#intB : payload.param2
+		}
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<wsc:consume doc:name="Consume" doc:id="b8221fc2-0f55-4791-8704-b88bc26f1d5c" config-ref="Web_Service_Consumer_Config" operation="Add"/>
+		<set-payload value="#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	Result : payload.body.AddResponse.AddResult&#10;}]" doc:name="Set Payload" doc:id="76331d56-8187-4f36-b3a6-e9592a2c4daa" />
+		<logger level="INFO" doc:name="Logger" doc:id="efee66f0-3437-4030-b69e-d23a45574378" message="************** EOF :: calc webservice App ****************"/>
+	</flow>
+</mule>
