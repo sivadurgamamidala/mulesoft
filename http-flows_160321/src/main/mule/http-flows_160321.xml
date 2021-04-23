@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="78429569-a6ca-4e6a-a9a4-ae429ad987fa" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<flow name="http-flows_160321Flow" doc:id="068564fd-343b-48cc-b319-ec291f7dbfea" >
+		<http:listener doc:name="Listener" doc:id="63cacce6-ca2a-40ba-9a6e-f960e887a454" config-ref="HTTP_Listener_config" path="/http-flows"/>
+		<logger level="INFO" doc:name="SOF" doc:id="fe130d59-d4b5-4016-879f-8c4165006f3b" message="********** SOF :: HTTP Flows App *********"/>
+		<logger level="INFO" doc:name="EOF" doc:id="fef5eb3a-81fb-4962-b722-65f6c31ddc23" message="********** EOF :: HTTP Flows App *********"/>
+		<flow-ref doc:name="Flow Reference" doc:id="478ed2a6-e166-4f7d-94fa-21506b4b3c66" name="http-flows_160321Sub_Flow"/>
+		<flow-ref doc:name="Flow Reference" doc:id="9ea956c2-190e-45cc-8a8b-084f9d90e42e" name="http-flows_160321Flow1"/>
+	</flow>
+	<flow name="http-flows_160321Flow1" doc:id="ead57ec8-128a-46d6-b356-28efdc41691e" >
+		<logger level="INFO" doc:name="Logger" doc:id="d0b62ffa-906d-42c7-bc69-89de85af0327" message="****************** Another Main Flow ****************"/>
+	</flow>
+	<sub-flow name="http-flows_160321Sub_Flow" doc:id="158730bb-ec94-4936-9d7e-bc7564daebdf" >
+		<logger level="INFO" doc:name="Logger" doc:id="66ce0b08-f30a-432b-85ec-cc3b8dcbf41b" message="****************** Inside Sub Flow logger1 *****************"/>
+		<logger level="INFO" doc:name="Logger" doc:id="d3ae91c1-aa27-430e-bbe9-40b4dc63c40b" message="****************** Inside Sub Flow logger2 *****************"/>
+		<logger level="INFO" doc:name="Logger" doc:id="8f0757ca-89b1-4c4b-bddc-25f038ecf17a" message="****************** Inside Sub Flow logger2 *****************"/>
+	</sub-flow>
+</mule>
