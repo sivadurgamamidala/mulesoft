@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="e5c128b4-afa8-4ad0-a4c9-a64d47dad65e" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<flow name="errorhandling_020421Flow_errorContinue" doc:id="a0f35441-a30d-49f1-80ac-1da779ec272f" >
+		<http:listener doc:name="Listener" doc:id="0702f11f-009c-4f2a-ab96-82e24bd8d43e" config-ref="HTTP_Listener_config" path="/continue"/>
+		<logger level="INFO" doc:name="Logger" doc:id="cc47d27a-7076-4d59-8c07-7687704490db" message="******************** SOF :: Error Handling App ***********************"/>
+		<ee:transform doc:name="Transform Message" doc:id="8e4d5a3b-1f9f-4044-8225-f0dd83f229b5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var Result = 1000/0
+---
+Result]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="a559539f-0ff9-424b-9595-c5d16cde2ec3" message="******************** EOF :: Error Handling App ***********************"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="66886195-18b3-4090-b660-71b3b7eb673e" >
+				<logger level="INFO" doc:name="Logger" doc:id="cce70dc0-1798-45cf-8784-3379fd34a305" message="********************* SOF :: Continue ********************"/>
+				<set-payload value='#["Updating payload in Error Continue"]' doc:name="Set Payload" doc:id="a0e83b4a-dff7-4090-a7bc-8b48328b6238" />
+				<logger level="INFO" doc:name="Logger" doc:id="a5381d6b-0d77-4bdc-a97e-f1eef0c68100" message="********************* EOF :: Continue ********************"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="errorhandling_020421Flow_errorPropagate" doc:id="21edd8c0-2be8-4e1d-b085-016bde46c7f9" >
+		<http:listener doc:name="Listener" doc:id="d96cc38a-d0d9-438f-9ff5-2b28aac495ad" config-ref="HTTP_Listener_config" path="/propagate"/>
+		<logger level="INFO" doc:name="Logger" doc:id="2a571970-3bbd-473e-a53f-8692fa179905" message="******************** SOF :: Error Handling App ***********************"/>
+		<ee:transform doc:name="Transform Message" doc:id="e0da03c5-143d-4336-8fec-2d8ddc909419" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var Result = 1000/0
+---
+Result]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="fbd1f9c3-bda6-4160-a4d6-20162d8cf944" message="******************** EOF :: Error Handling App ***********************"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c21a0eb7-24f4-4fea-8781-d0e734394be5">
+				<logger level="INFO" doc:name="Logger" doc:id="7a35be86-e5d6-43f5-9181-9886b5dce512" message="********************* SOF :: Propagate ********************"/>
+				<set-payload value='#["Updating payload in Error Propagate"]' doc:name="Set Payload" doc:id="e941ee7d-a90c-4779-a03c-bf8f8acb462d" />
+				<logger level="INFO" doc:name="Logger" doc:id="e07809ab-272b-4950-9e8a-623dd22d63fb" message="********************* EOF :: Propagate ********************"/>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>
