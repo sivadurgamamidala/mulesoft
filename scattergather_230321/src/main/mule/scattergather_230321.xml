@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="2bdd6689-1c64-4b6a-a37c-ddb037d49c17" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<flow name="scattergather_230321Flow" doc:id="28138a70-b7e8-4bec-8851-a072bfe284b6" >
+		<http:listener doc:name="Listener" doc:id="15dea579-6793-4758-b576-4ad62f5dd81d" config-ref="HTTP_Listener_config" path="/scattergather"/>
+		<logger level="INFO" doc:name="Logger" doc:id="94ab39f8-7555-4dfe-986e-c137a5b2d7a8" message="*************SOF :: Scatter Gather App*************"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="653e4701-c481-4c9d-965b-a4e4ee63a287" >
+			<route >
+				<logger level="INFO" doc:name="Logger" doc:id="f9d4dac1-2eba-4e53-8036-6b2424e38d24" message="***************Flow1*****************"/>
+				<set-payload value='#["Inside Flow1"]' doc:name="Set Payload" doc:id="4a972ddc-88ba-4810-b5b9-e81170070f58" />
+			</route>
+			<route >
+				<logger level="INFO" doc:name="Logger" doc:id="8279d152-4c44-482d-b822-db1089f87e81" message="***************Flow2*****************"/>
+				<set-payload value='#["Inside Flow2"]' doc:name="Set Payload" doc:id="ca4ac764-1815-4a96-ac40-d534d1a7e6d9" />
+			</route>
+			<route >
+				<logger level="INFO" doc:name="Logger" doc:id="4e8acb9b-bc33-4fd0-bd0d-f5ed4ba40fd3" message="***************Flow3*****************"/>
+				<set-payload value='#["Inside Flow3"]' doc:name="Set Payload" doc:id="477b1f67-bb3e-46ef-9669-2a6186cba683" />
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="6f7e79fa-2a66-43b2-864f-e863d091e162" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="80b42097-9572-47b1-acce-bd0d28ff7c50" message="*************EOF :: Scatter Gather App*************"/>
+	</flow>
+	<flow name="scattergather_230321Flow1" doc:id="30c4a6ca-783d-4560-8cfe-f891320cb3d5" >
+		<scheduler doc:name="Scheduler" doc:id="d6e3637e-e454-40b2-97cd-f40399c2652d" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="10" timeUnit="SECONDS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="Logger" doc:id="3bb9d18d-6c78-4165-802e-1a378ef690fe" message="************SOF:: Scheduler App**************"/>
+		<logger level="INFO" doc:name="Logger" doc:id="3b070126-3ac9-4a28-a840-0d1a7a78420a" message="************SOF:: Scheduler App**************"/>
+	</flow>
+</mule>
