@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="add" format="json">
+      <types:shape format="weave" example="examples/orderInput_Array_read1.json"><![CDATA[%dw 2.0
+
+type add = {|
+  sno: String, 
+  transid: String, 
+  order: {|
+    orderHeader: {|
+      orderNumber: String, 
+      orderQty: String, 
+      totalCost: String, 
+      cardName: String, 
+      operation: String, 
+      orderLines: Array<{|        lineNo: String,         lineQty: Number {"typeId": "int"},         lineCost: Number {"typeId": "int"}      |}>
+    |}
+  |}
+|} {"example": "{\\\"sno\\\":\\\"4\\\",\\\"transid\\\":\\\"04444\\\",\\\"order\\\":{\\\"orderHeader\\\":{\\\"orderNumber\\\":\\\"0123456\\\",\\\"orderQty\\\":\\\"6\\\",\\\"totalCost\\\":\\\"3000\\\",\\\"cardName\\\":\\\"AXIS\\\",\\\"operation\\\":\\\"create\\\",\\\"orderLines\\\":[{\\\"lineNo\\\":\\\"1111\\\",\\\"lineQty\\\":1,\\\"lineCost\\\":1000},{\\\"lineNo\\\":\\\"2222\\\",\\\"lineQty\\\":2,\\\"lineCost\\\":2000},{\\\"lineNo\\\":\\\"3333\\\",\\\"lineQty\\\":3,\\\"lineCost\\\":3000},{\\\"lineNo\\\":\\\"4444\\\",\\\"lineQty\\\":4,\\\"lineCost\\\":4000}]}}}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#c40873c0-e888-4990-a56c-347ca95cb336">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="add"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="fe595b93-8d6d-4538-9f84-deb031b6b19d" >
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+	<flow name="amz-mysql-orderprocessing-procFlow" doc:id="ba7ddf33-9fc8-48c1-abe5-ca197f83bcaf" >
+		<http:listener doc:name="Receive Order Info" doc:id="fcfc7f74-13f3-4314-8611-960abec6d784" config-ref="HTTP_Listener_config_Domain" path="/api/amzorder/proclayer"/>
+		<logger level="INFO" doc:name="SOF :: Order Processing Process layer" doc:id="5bedabfd-1936-4cdb-ba72-315686f8ce5b" message="************** SOF :: Order Processing Proc layer ***************"/>
+		<choice doc:name="Choice" doc:id="18a69bc6-32ba-45e1-8cc9-5bb68e703f5f">
+			<when expression='#[payload.order.orderHeader.operation == "Create"]'>
+				<logger level="INFO" doc:name="Create Process Layer" doc:id="6773d9ce-54cd-433c-bfa9-595fdbae7408" message="************ Inside Create operation - Proc Layer **********" />
+				<http:request method="POST" doc:name="Request" doc:id="2e34fbdb-6325-44c5-bf45-01a0bc8efed0" config-ref="HTTP_Request_configuration" path="/api/amzorder/syslayer/create"/>
+			</when>
+			<when expression='#[payload.order.orderHeader.operation == "Retrieve"]'>
+				<logger level="INFO" doc:name="Retrieve Process Layer" doc:id="e8d6c6b5-3e77-41e1-9124-c55a1aa25558" message="************ Inside Retrieve operation - Proc Layer **********" />
+				<http:request method="POST" doc:name="Request" doc:id="b6d26039-44aa-4b54-aeba-8b9ff0265e01" config-ref="HTTP_Request_configuration" path="/api/amzorder/syslayer/retrieve"/>
+			</when>
+			<when expression='#[payload.order.orderHeader.operation == "Cancel"]'>
+				<logger level="INFO" doc:name="Cancel Process Layer" doc:id="9533b6a8-b4f4-46f0-b5b7-f6ec583e0060" message="************ Inside Cancel operation - Proc Layer **********" />
+				<http:request method="POST" doc:name="Request" doc:id="0847ce5c-a62f-4416-a0f8-26c081998d25" config-ref="HTTP_Request_configuration" path="/api/amzorder/syslayer/cancel"/>
+			</when>
+			<when expression='payload.order.orderHeader.operation == "Delete"'>
+				<logger level="INFO" doc:name="Delete Process Layer" doc:id="ec9087f8-6cd0-47b2-8191-6ff61fc44eb6" message="************ Inside Delete operation - Proc Layer **********" />
+				<http:request method="POST" doc:name="Request" doc:id="f2a53cf8-a37a-4a7b-8785-e687fa3e7a7c" config-ref="HTTP_Request_configuration" path="/api/amzorder/syslayer/delete"/>
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="Default Operation" doc:id="7230cf7a-b84f-456a-aecf-23e07d6cd815" message="*********** DEFAULT - No matching Operations - Out of Scope ************" />
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="EOF :: Order Processing Process layer" doc:id="c296dd65-d486-4eb8-80d3-a048444cb66e" message="************** EOF :: Order Processing Proc layer ***************" />
+	</flow>
+</mule>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="ae38d7c3-db2f-49c2-8617-27a500f05866" >
+		<http:request-connection host="localhost" port="8081" connectionIdleTimeout="60000"/>
+	</http:request-config>
+	<sub-flow name="orderprocessing-exp-layer-implementationSub_Flow" doc:id="31b749d2-5053-4f71-9488-00e432ffb295" >
+		<logger level="INFO" doc:name="Started" doc:id="84408eae-66e4-4cf0-a1a7-0925bac62bb1" message="******************* SOF :: Inside Subflow - order Create Validation *******************"/>
+		<choice doc:name="Choice" doc:id="db52c8a9-4e6e-4227-85f3-f2e51df2f88a" >
+			<when expression="#[sizeOf(payload.order.orderHeader.orderNumber) &gt;= 5 and sizeOf(payload.order.orderHeader.orderLines) &lt;= 6]" doc:id="b1a8bde9-e892-4e1e-9a75-adf3e4db7823">
+				<logger level="INFO" doc:name="Valid Order" doc:id="2fb2f91c-253b-4923-ab76-049ae1e12562" message="******************** Valid Order - Before calling process Api ********************"/>
+				<http:request method="POST" doc:name="Request" doc:id="df5f9268-4cc9-4bd0-858b-6f3b539b513c" config-ref="HTTP_Request_configuration" path="/api/amzorder/proclayer"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Invalid Order - Default" doc:id="99cad17f-9129-4d09-aa3e-f5e06ddf2bcf" message="****************** Invalid Order - Default Choice flow *******************"/>
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>

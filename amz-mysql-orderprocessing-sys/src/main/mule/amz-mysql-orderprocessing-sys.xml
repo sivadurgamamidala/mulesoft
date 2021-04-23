@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="39032496-29f1-496c-b007-33dc3a478736" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="student" database="training" />
+	</db:config>
+	<flow name="amz-mysql-orderprocessing-sysFlow_Create" doc:id="44eea30f-1b27-4fba-b236-4f9d052fdda3" >
+		<http:listener doc:name="Listener" doc:id="ced853ce-090f-46b4-af2a-1b83f0ed9498" config-ref="HTTP_Listener_config_Domain" path="/api/amzorder/syslayer/create"/>
+		<logger level="INFO" doc:name="Logger" doc:id="6d3f9224-ba7b-4f8d-8d0c-31a60663feb3" message="************ SOF :: AmzOrder processing - Create Flow *****************"/>
+		<db:insert doc:id="c40873c0-e888-4990-a56c-347ca95cb336" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into amzorder1 values (:transid, :orderNumber, :orderQty, :totalCost, :cardName, :status)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	transid: payload.transid,
+	orderNumber: payload.order.orderHeader.orderNumber,
+	orderQty: payload.order.orderHeader.orderQty,
+	totalCost: payload.order.orderHeader.totalCost,
+	cardName: payload.order.orderHeader.cardName,
+	status: "Active"
+}]]]></db:input-parameters>
+		</db:insert>
+		<logger level="INFO" doc:name="Logger" doc:id="8fb307e9-8429-4c2e-8c90-0b6cc61214c9" message="************ EOF :: AmzOrder processing - Create Flow *****************"/>
+	</flow>
+	<flow name="amz-mysql-orderprocessing-sysFlow_Retrieve" doc:id="65e31014-eec6-4e58-b867-f986696478c8" >
+		<http:listener doc:name="Listener" doc:id="02644669-dbe4-4021-8f2c-136d0de431fe" config-ref="HTTP_Listener_config_Domain" path="/api/amzorder/syslayer/retrieve"/>
+		<logger level="INFO" doc:name="Logger" doc:id="890be990-982b-4697-af34-de89102f6868" message="************ SOF :: AmzOrder processing - Retrieve Flow *****************"/>
+		<db:select doc:name="Select" doc:id="f71cdf54-8708-4499-974c-3dd42e3e1ef1" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from amzorder1 where ordernumber = :orderNumber]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	orderNumber: payload.order.orderHeader.orderNumber
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="69937651-66a2-4d51-a127-bd14f936667b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="bc8f8ac6-0898-49b4-bce9-c67d6c69f98f" message="************ EOF :: AmzOrder processing - Retrieve Flow *****************"/>
+	</flow>
+	<flow name="amz-mysql-orderprocessing-sysFlow_Cancel" doc:id="32277c2b-1344-494a-aaa6-8c278d09aca4" >
+		<http:listener doc:name="Listener" doc:id="e7509c45-e1c7-462c-b98f-3a67e37d9de7" config-ref="HTTP_Listener_config_Domain" path="/api/amzorder/syslayer/cancel"/>
+		<logger level="INFO" doc:name="Logger" doc:id="de84db07-651d-4966-b7c6-5e8e2f01c442" message="************ SOF :: AmzOrder processing - Cancel Flow *****************"/>
+		<db:update doc:name="Update" doc:id="2fe75e6b-a4fc-4b9c-bd9c-e537921beb98" config-ref="Database_Config">
+			<db:sql ><![CDATA[update amzorder1 set status = 'Cancelled' where ordernumber = :orderNumber]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	orderNumber : payload.order.orderHeader.orderNumber
+}]]]></db:input-parameters>
+		</db:update>
+		<logger level="INFO" doc:name="Logger" doc:id="43fb7725-f51d-4a5e-b43f-f033fae37078" message="************ EOF :: AmzOrder processing - Cancel Flow *****************"/>
+	</flow>
+	<flow name="amz-mysql-orderprocessing-sysFlow_Delete" doc:id="b8532a3d-7e17-4068-8542-ce997d30f6a5" >
+		<http:listener doc:name="Listener" doc:id="0fc96cba-4e9b-4ddb-ade6-d3092023143f" config-ref="HTTP_Listener_config_Domain" path="/api/amzorder/syslayer/delete"/>
+		<logger level="INFO" doc:name="Logger" doc:id="9d39a4b8-ce0f-4f3d-b4f2-663c825a46e7" message="************ SOF :: AmzOrder processing - Delete Flow *****************"/>
+		<db:update doc:name="Update" doc:id="86bf6d53-d28c-4ad3-8368-69c9cc882eba" config-ref="Database_Config">
+			<db:sql ><![CDATA[update amzorder1 set status = 'Deleted' where ordernumber = :orderNumber]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	orderNumber: payload.order.orderHeader.orderNumber
+}]]]></db:input-parameters>
+		</db:update>
+		<logger level="INFO" doc:name="Logger" doc:id="119065d1-c04b-4ce7-9bca-bf9f9ec303da" message="************ EOF :: AmzOrder processing - Delete Flow *****************"/>
+	</flow>
+</mule>
+

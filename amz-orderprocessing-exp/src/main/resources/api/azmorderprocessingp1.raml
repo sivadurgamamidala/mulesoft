@@ -1,0 +1,29 @@
+#%RAML 1.0
+title: AmzOrderProcessingP1
+baseUri: http://localhost:8081/api/azmorder
+version: 1.0
+description: this is RAML for amazon order processing
+
+traits:
+  resp200: !include exchange_modules/f5a02d58-02de-4b4c-bd81-4b8b29f17be4/response200/2.0.1/response200.raml
+
+/process:
+  is: [resp200]
+  post:
+    body:
+      application/json:
+        example: !include examples/orderRequestExample.raml
+  get:
+    queryParameters:
+      orderNumber:
+        type: string
+        required: true
+  delete:
+    queryParameters:
+      orderNumber:
+        type: string
+        required: true
+  patch:
+    body:
+      application/json:
+        example: !include examples/orderRequestExample.raml
