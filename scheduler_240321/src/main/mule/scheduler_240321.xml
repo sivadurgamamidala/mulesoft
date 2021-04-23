@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="scheduler_240321Flow" doc:id="7f078451-4d90-402d-8655-116a91de8648" >
+		<scheduler doc:name="Scheduler" doc:id="897a02e1-a00a-42f6-bf07-0e95bd3cd1db" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="60" startDelay="30" timeUnit="SECONDS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="Logger" doc:id="6fa26296-00d5-4fd0-82f5-e1169777a545" message="***********SOF::Scheduler App*************"/>
+		<ee:transform doc:name="Transform Message" doc:id="4ce3cf55-0e70-4f1d-8a2c-bc1243784bea" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"order" : {
+		"orderHeader" : {
+			"orderNumber" : "0123456",
+			"orderQty" : "6",
+			"totalCost" : "3000",
+			"cardName" : "AXIS",
+			"operation" : "create"
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="e4ea2de7-6fc7-4cbb-b6a8-d4641b04a991" >
+			<route >
+				<logger level="INFO" doc:name="Logger" doc:id="0dbefbf6-1b3a-4c13-b1cb-4ca3a8e21500" message="Flow1"/>
+				<set-payload value='#["Inside Flow1"]' doc:name="Set Payload" doc:id="489f35fe-1079-47a7-a90c-1df5c4033477" />
+			</route>
+			<route >
+				<logger level="INFO" doc:name="Logger" doc:id="8e3fbe17-5246-4f91-a5d5-b504db38c534" message="Flow2"/>
+				<set-payload value='#["Inside Flow2"]' doc:name="Set Payload" doc:id="d7ae9383-b26f-49c6-aa6e-d730116f33ef" />
+			</route>
+			<route >
+				<logger level="INFO" doc:name="Logger" doc:id="2f95a479-99e1-434b-b6ec-86cb1038dedb" message="Flow3"/>
+				<set-payload value='#["Inside Flow3"]' doc:name="Set Payload" doc:id="12993d1d-3a29-4dba-9c56-e35d39f13033" />
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="da2d89a1-bb84-4636-8d70-86785fd79ea0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="02b5040b-5433-40d3-b811-6ce32b1a7ded" message="***********EOF::Scheduler App*************"/>
+	</flow>
+</mule>
