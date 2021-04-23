@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<jms:config name="JMS_Config" doc:name="JMS Config" doc:id="08766b51-c463-4784-910b-af545803805a" >
+		<jms:active-mq-connection username="admin" password="admin">
+			<jms:factory-configuration brokerUrl="tcp://localhost:61616" />
+		</jms:active-mq-connection>
+	</jms:config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="2d676f6c-4350-4a23-9ace-d0cce477cb75" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<flow name="jms_active-mq_250321Flow" doc:id="59a1a52c-02ef-4ca0-86c3-88e8dfed8caa" >
+		<jms:listener doc:name="On New Message" doc:id="102a4378-fd64-4227-a3bd-81f82136609e" config-ref="JMS_Config" destination="orderInput,orderInput1"/>
+		<logger level="INFO" doc:name="Logger" doc:id="708ec247-2caa-4fd4-99e3-2bf9aff5fac2" message="************ SOF :: activeMQ JMS App ********** payload from queue #[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="f895a1e2-031a-4d26-9269-6cab98b35298" message="************ EOF :: activeMQ JMS App **********"/>
+	</flow>
+	<flow name="jms_active-mq_250321Flow1" doc:id="daa9afd4-ec34-48e6-bc95-ed805d069592" >
+		<http:listener doc:name="Listener" doc:id="84fd964b-1310-4b21-9c16-d02e7dedd8ea" config-ref="HTTP_Listener_config" path="/publish"/>
+		<logger level="INFO" doc:name="Logger" doc:id="e452f634-6912-4d74-805e-2409c070fbdf" />
+		<jms:publish doc:name="Publish" doc:id="c6882e56-2dff-4421-ba8e-355cf2f6ca1b" config-ref="JMS_Config" destination="orderOutput"/>
+		<logger level="INFO" doc:name="Logger" doc:id="e9db0d9a-8a8c-4183-ab66-5e8c5e79dd81" />
+	</flow>
+</mule>
